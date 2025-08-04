@@ -27,6 +27,8 @@ public class JwtTokenProvider {
     private long jwtExpirationMs;
 
     public String generateToken(UserDetails userDetails) {
+        log.info("Generating token for user: {}", userDetails.getUsername());
+        log.info("User authorities: {}", userDetails.getAuthorities());
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof org.springframework.security.core.userdetails.User) {
             claims.put("roles", userDetails.getAuthorities().stream()
@@ -69,22 +71,8 @@ public class JwtTokenProvider {
     }
 
     private Key getSigningKey() {
-        try {
-            // Удаляем возможные пробелы и переводы строк
-            String cleanSecret = jwtSecret.trim().replaceAll("\\s", "");
-
-            // Проверяем, является ли строка валидным Base64
-            if (cleanSecret.matches("^[a-zA-Z0-9+/]+={0,2}$")) {
-                byte[] keyBytes = Decoders.BASE64.decode(cleanSecret);
-                return Keys.hmacShaKeyFor(keyBytes);
-            } else {
-                // Если не Base64, используем как есть (только для разработки!)
-                log.warn("JWT secret is not valid Base64 - using raw string (not secure for production!)");
-                return Keys.hmacShaKeyFor(cleanSecret.getBytes(StandardCharsets.UTF_8));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create signing key", e);
-        }
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private boolean isTokenExpired(String token) {

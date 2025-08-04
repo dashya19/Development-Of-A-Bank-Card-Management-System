@@ -70,7 +70,7 @@ public class AuthService {
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         user.setRoles(Set.of(userRole));
-
+        log.info("Registering user with roles: {}", user.getRoles());
         userRepository.save(user);
     }
 }

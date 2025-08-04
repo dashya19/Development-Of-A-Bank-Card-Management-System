@@ -29,7 +29,7 @@ spring:
 
 app:
   jwt:
-    secret: "cXdlcnR5dWlvcGFzZGZnaGprbHp4Y3Zibm0xMjM0NTY3ODkw"  # В кавычках
+    secret: "cXdlcnR5dWlvcGFzZGZnaGprbHp4Y3Zibm0xMjM0NTY3ODkw"  # Должен быть валидным Base64
     expiration-ms: 86400000
   encryption:
     secret-key: this-is-a-secret-key-for-encryption

@@ -1,5 +1,6 @@
 package com.example.bankcards.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Component
 public class EncryptionUtils {
     @Value("${app.encryption.secret-key}")
@@ -18,6 +20,7 @@ public class EncryptionUtils {
 
     public String encrypt(String data) {
         try {
+            log.info("Encrypting data, length: {}", data.length());
             SecretKeySpec key = generateKey();
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
