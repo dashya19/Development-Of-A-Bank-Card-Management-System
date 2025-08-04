@@ -6,6 +6,7 @@ com\example\bankcards\dto\AuthRequest.class
 com\example\bankcards\config\LiquibaseConfig.class
 com\example\bankcards\controller\CardController.class
 com\example\bankcards\exception\InsufficientFundsException.class
+com\example\bankcards\dto\TopUpDTO.class
 com\example\bankcards\dto\CardDTO.class
 com\example\bankcards\entity\User.class
 com\example\bankcards\dto\AuthResponse.class

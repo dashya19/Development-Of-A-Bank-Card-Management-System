@@ -1,6 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.CardDTO;
+import com.example.bankcards.dto.TopUpDTO;
 import com.example.bankcards.dto.TransferDTO;
 import com.example.bankcards.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -75,5 +76,12 @@ public class CardController {
             @AuthenticationPrincipal UserDetails userDetails) {
         cardService.deleteCard(id, userDetails);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/top-up")
+    public ResponseEntity<CardDTO> topUpCard(
+            @RequestBody TopUpDTO topUpDTO,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(cardService.topUpCard(topUpDTO, userDetails));
     }
 }

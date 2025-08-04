@@ -23,7 +23,7 @@ public class Card {
     @Column(name = "card_holder", nullable = false)
     private String cardHolder;
 
-    @Column(name = "expiry_date", nullable = false)
+    @Column(name = "expiry_date", nullable = false, length = 5)
     private String expiryDate;
 
     @Enumerated(EnumType.STRING)
