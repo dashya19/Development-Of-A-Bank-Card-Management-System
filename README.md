@@ -1,8 +1,13 @@
 # 🏦 Система управления банковскими картами
 
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.1.0-green.svg)
+![Java](https://img.shields.io/badge/Java-17-red.svg)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.0-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)
-![Liquibase](https://img.shields.io/badge/Liquibase-4.0-yellow.svg)
+![Liquibase](https://img.shields.io/badge/Liquibase-4.25.0-yellow.svg)
+![JWT](https://img.shields.io/badge/JWT-0.11.5-orange.svg)
+![Swagger](https://img.shields.io/badge/Swagger-2.2.0-lightgreen.svg)
+![Lombok](https://img.shields.io/badge/Lombok-1.18.30-pink.svg)
+![MapStruct](https://img.shields.io/badge/MapStruct-1.5.5-blueviolet.svg)
 ![Docker](https://img.shields.io/badge/Docker-20.10-lightblue.svg)
 
 ## 📌 О проекте
