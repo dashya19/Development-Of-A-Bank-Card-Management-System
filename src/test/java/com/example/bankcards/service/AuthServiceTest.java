@@ -14,15 +14,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,53 +29,77 @@ class AuthServiceTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private RoleRepository roleRepository;
+
     @Mock
     private PasswordEncoder passwordEncoder;
+
     @Mock
     private JwtTokenProvider jwtTokenProvider;
-    @Mock
-    private Authentication authentication;
 
     @InjectMocks
     private AuthService authService;
 
     @Test
-    void authenticateUser_ShouldReturnToken() {
+    void authenticateUser_Success() {
         AuthRequest request = new AuthRequest();
-        request.setUsername("user");
-        request.setPassword("pass");
+        request.setUsername("test");
+        request.setPassword("password");
 
+        Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(jwtTokenProvider.generateToken(any())).thenReturn("token");
 
         AuthResponse response = authService.authenticateUser(request);
+
         assertEquals("token", response.getToken());
+        verify(authenticationManager).authenticate(any());
     }
 
     @Test
-    void registerUser_ShouldSaveUser() {
+    void authenticateUser_BadCredentials() {
         AuthRequest request = new AuthRequest();
-        request.setUsername("user");
-        request.setPassword("pass");
-        request.setEmail("user@test.com");
+        request.setUsername("test");
+        request.setPassword("wrong");
 
-        when(userRepository.existsByUsername(any())).thenReturn(false);
-        when(userRepository.existsByEmail(any())).thenReturn(false);
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(new Role()));
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Invalid credentials"));
+
+        assertThrows(BadCredentialsException.class, () -> authService.authenticateUser(request));
+    }
+
+    @Test
+    void registerUser_Success() {
+        AuthRequest request = new AuthRequest();
+        request.setUsername("newuser");
+        request.setPassword("password");
+        request.setEmail("new@example.com");
+
+        Role role = new Role();
+        role.setName("ROLE_USER");
+
+        when(userRepository.existsByUsername("newuser")).thenReturn(false);
+        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
+        when(passwordEncoder.encode("password")).thenReturn("encoded");
 
         authService.registerUser(request);
-        verify(userRepository, times(1)).save(any());
+
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
-    void registerUser_ShouldThrowWhenUsernameExists() {
+    void registerUser_UsernameExists() {
         AuthRequest request = new AuthRequest();
-        request.setUsername("user");
-        when(userRepository.existsByUsername(any())).thenReturn(true);
+        request.setUsername("existing");
+        request.setPassword("password");
+        request.setEmail("new@example.com");
+
+        when(userRepository.existsByUsername("existing")).thenReturn(true);
 
         assertThrows(UserAlreadyExistsException.class, () -> authService.registerUser(request));
     }

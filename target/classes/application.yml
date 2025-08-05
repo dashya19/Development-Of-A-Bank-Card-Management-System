@@ -39,7 +39,7 @@ springdoc:
 
 logging:
   file:
-    name: logs/application.log  # Файл будет создан в папке logs/
+    name: logs/application.log
   level:
     org.springframework.security: DEBUG
     com.example.bankcards: DEBUG

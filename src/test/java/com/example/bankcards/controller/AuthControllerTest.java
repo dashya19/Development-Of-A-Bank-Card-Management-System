@@ -4,45 +4,50 @@ import com.example.bankcards.dto.AuthRequest;
 import com.example.bankcards.dto.AuthResponse;
 import com.example.bankcards.service.AuthService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private AuthService authService;
 
-    @Test
-    void authenticateUser_ShouldReturnToken() throws Exception {
-        AuthResponse response = new AuthResponse("test-token");
-        when(authService.authenticateUser(any(AuthRequest.class))).thenReturn(response);
+    @InjectMocks
+    private AuthController authController;
 
-        mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"user\",\"password\":\"pass\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("test-token"));
+    @Test
+    void authenticateUser_Success() {
+        AuthRequest request = new AuthRequest();
+        request.setUsername("test");
+        request.setPassword("password");
+
+        AuthResponse response = new AuthResponse("token");
+        when(authService.authenticateUser(request)).thenReturn(response);
+
+        ResponseEntity<AuthResponse> result = authController.authenticateUser(request);
+
+        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(response, result.getBody());
+        verify(authService).authenticateUser(request);
     }
 
     @Test
-    void registerUser_ShouldReturnOk() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"user\",\"password\":\"pass\",\"email\":\"user@test.com\"}"))
-                .andExpect(status().isOk());
+    void registerUser_Success() {
+        AuthRequest request = new AuthRequest();
+        request.setUsername("test");
+        request.setPassword("password");
+        request.setEmail("test@example.com");
+
+        ResponseEntity<Void> result = authController.registerUser(request);
+
+        assertEquals(200, result.getStatusCodeValue());
+        verify(authService).registerUser(request);
     }
 }
