@@ -6,5 +6,5 @@ import lombok.Data;
 public class AuthRequest {
     private String username;
     private String password;
-    private String email; // только для регистрации
+    private String email;
 }

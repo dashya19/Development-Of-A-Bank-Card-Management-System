@@ -20,14 +20,14 @@ public class EncryptionUtils {
 
     public String encrypt(String data) {
         try {
-            log.info("Encrypting data, length: {}", data.length());
+            log.info("Шифрование данных, длина: {}", data.length());
             SecretKeySpec key = generateKey();
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] encryptedBytes = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
-            throw new RuntimeException("Error encrypting data", e);
+            throw new RuntimeException("Ошибка при шифровании данных", e);
         }
     }
 
@@ -40,7 +40,7 @@ public class EncryptionUtils {
             byte[] decryptedBytes = cipher.doFinal(decodedBytes);
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Error decrypting data", e);
+            throw new RuntimeException("Ошибка при расшифровке данных", e);
         }
     }
 

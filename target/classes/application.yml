@@ -1,20 +1,11 @@
-#
-# application.yml — главный конфигурационный файл Spring Boot.
-
-#Что нужно сделать:
-#  - Указать настройки подключения к базе данных.
-#  - Указать порт приложения.
-#  - Настроить параметры безопасности и JWT.
-#  - Включить Swagger UI.
-
 server:
   port: 8080
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bank_cards_db
-    username: postgres
-    password: darina2003z1x2c3
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bank_cards_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -29,11 +20,15 @@ spring:
 
 app:
   jwt:
-    secret: "cXdlcnR5dWlvcGFzZGZnaGprbHp4Y3Zibm0xMjM0NTY3ODkw"  # Должен быть валидным Base64
-    expiration-ms: 86400000
+    secret: ${JWT_SECRET}
+    expiration-ms: ${JWT_EXPIRATION_MS}
   encryption:
     secret-key: this-is-a-secret-key-for-encryption
     salt: random-salt-value
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD}
+    email: ${ADMIN_EMAIL}
 
 springdoc:
   api-docs:

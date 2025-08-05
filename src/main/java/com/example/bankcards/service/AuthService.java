@@ -45,21 +45,21 @@ public class AuthService {
             String jwt = jwtTokenProvider.generateToken(userDetails);
             return new AuthResponse(jwt);
         } catch (BadCredentialsException e) {
-            log.error("Authentication failed for user: " + authRequest.getUsername(), e);
+            log.error("Не удалось выполнить аутентификацию пользователя: " + authRequest.getUsername(), e);
             throw new BadCredentialsException("Invalid username or password");
         } catch (Exception e) {
-            log.error("Unexpected authentication error", e);
+            log.error("Неверное имя пользователя или пароль", e);
             throw new RuntimeException("Authentication failed", e);
         }
     }
 
     public void registerUser(AuthRequest authRequest) {
         if (userRepository.existsByUsername(authRequest.getUsername())) {
-            throw new UserAlreadyExistsException("Username is already taken!");
+            throw new UserAlreadyExistsException("Имя пользователя уже занято!");
         }
 
         if (userRepository.existsByEmail(authRequest.getEmail())) {
-            throw new UserAlreadyExistsException("Email is already in use!");
+            throw new UserAlreadyExistsException("Электронная почта уже используется!");
         }
 
         User user = new User();
@@ -68,9 +68,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(authRequest.getPassword()));
 
         Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                .orElseThrow(() -> new RuntimeException("Error: Роль не найдена."));
         user.setRoles(Set.of(userRole));
-        log.info("Registering user with roles: {}", user.getRoles());
         userRepository.save(user);
     }
 }

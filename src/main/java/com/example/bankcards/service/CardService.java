@@ -33,6 +33,46 @@ public class CardService {
     private final UserRepository userRepository;
     private final EncryptionUtils encryptionUtils;
 
+    // Методы для администратора
+    public Page<CardDTO> getAllCards(Pageable pageable) {
+        return cardRepository.findAll(pageable).map(this::convertToDTO);
+    }
+
+    public CardDTO getAnyCardById(Long id) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
+        return convertToDTO(card);
+    }
+
+    public CardDTO createCardForUser(CardDTO cardDTO, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id не найден: " + userId));
+
+        if (cardRepository.existsByCardNumber(encryptionUtils.encrypt(cardDTO.getCardNumber()))) {
+            throw new CardAlreadyExistsException("Карта с этим номером уже существует");
+        }
+
+        Card card = new Card();
+        card.setCardNumber(encryptionUtils.encrypt(cardDTO.getCardNumber()));
+        card.setCardHolder(cardDTO.getCardHolder());
+        card.setExpiryDate(cardDTO.getExpiryDate());
+        card.setStatus(CardStatus.ACTIVE);
+        card.setBalance(BigDecimal.ZERO);
+        card.setUser(user);
+
+        Card savedCard = cardRepository.save(card);
+        return convertToDTO(savedCard);
+    }
+
+    public CardDTO adminBlockCard(Long id) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
+
+        card.setStatus(CardStatus.BLOCKED);
+        Card savedCard = cardRepository.save(card);
+        return convertToDTO(savedCard);
+    }
+
     public Page<CardDTO> getUserCards(UserDetails userDetails, Pageable pageable) {
         User user = getUserByUsername(userDetails.getUsername());
         return cardRepository.findAllByUser(user, pageable)
@@ -49,7 +89,7 @@ public class CardService {
     public CardDTO getCardById(Long id, UserDetails userDetails) {
         User user = getUserByUsername(userDetails.getUsername());
         Card card = cardRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
         return convertToDTO(card);
     }
 
@@ -57,7 +97,7 @@ public class CardService {
         User user = getUserByUsername(userDetails.getUsername());
 
         if (cardRepository.existsByCardNumber(encryptionUtils.encrypt(cardDTO.getCardNumber()))) {
-            throw new CardAlreadyExistsException("Card with this number already exists");
+            throw new CardAlreadyExistsException("Карта с этим номером уже существует");
         }
 
         Card card = new Card();
@@ -77,17 +117,17 @@ public class CardService {
         User user = getUserByUsername(userDetails.getUsername());
 
         Card fromCard = cardRepository.findByIdAndUser(transferDTO.getFromCardId(), user)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + transferDTO.getFromCardId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + transferDTO.getFromCardId()));
 
         Card toCard = cardRepository.findByIdAndUser(transferDTO.getToCardId(), user)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + transferDTO.getToCardId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + transferDTO.getToCardId()));
 
         if (fromCard.getStatus() != CardStatus.ACTIVE || toCard.getStatus() != CardStatus.ACTIVE) {
-            throw new CardNotActiveException("One or both cards are not active");
+            throw new CardNotActiveException("Одна или обе карты не активны");
         }
 
         if (fromCard.getBalance().compareTo(transferDTO.getAmount()) < 0) {
-            throw new InsufficientFundsException("Insufficient funds on the source card");
+            throw new InsufficientFundsException("Недостаточно средств на исходной карте");
         }
 
         fromCard.setBalance(fromCard.getBalance().subtract(transferDTO.getAmount()));
@@ -100,10 +140,10 @@ public class CardService {
     public CardDTO blockCard(Long id, UserDetails userDetails) {
         User user = getUserByUsername(userDetails.getUsername());
         Card card = cardRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
 
         if (card.getStatus() == CardStatus.BLOCKED) {
-            throw new CardOperationException("Card is already blocked");
+            throw new CardOperationException("Карта уже заблокирована");
         }
 
         card.setStatus(CardStatus.BLOCKED);
@@ -113,36 +153,36 @@ public class CardService {
 
     public CardDTO activateCard(Long id, UserDetails userDetails) {
         try {
-            log.info("Attempting to activate card ID: {} for user: {}", id, userDetails.getUsername());
+            log.info("Попытка активировать id карты: {} пользователя: {}", id, userDetails.getUsername());
 
             User user = getUserByUsername(userDetails.getUsername());
-            log.info("User found: {}", user.getId());
+            log.info("Пользователь найден: {}", user.getId());
 
             Card card = cardRepository.findByIdAndUser(id, user)
                     .orElseThrow(() -> {
-                        log.error("Card not found with ID: {} for user: {}", id, user.getUsername());
-                        return new ResourceNotFoundException("Card not found with id: " + id);
+                        log.error("Не найдена карточка с id: {} для пользователя: {}", id, user.getUsername());
+                        return new ResourceNotFoundException("Карта с id не найдена: " + id);
                     });
 
-            log.info("Current card status: {}", card.getStatus());
-            log.info("Card expiry date: {}", card.getExpiryDate());
+            log.info("Текущий статус карты: {}", card.getStatus());
+            log.info("Дата истечения срока действия карты: {}", card.getExpiryDate());
 
             if (card.getStatus() == CardStatus.ACTIVE) {
-                log.warn("Card is already active");
-                throw new CardOperationException("Card is already active");
+                log.warn("Карта уже активна");
+                throw new CardOperationException("Карта уже активна");
             }
 
             if (isCardExpired(card.getExpiryDate())) {
-                log.warn("Card is expired: {}", card.getExpiryDate());
-                throw new CardOperationException("Cannot activate expired card");
+                log.warn("Срок действия карты истек: {}", card.getExpiryDate());
+                throw new CardOperationException("Не удается активировать карту с истекшим сроком действия");
             }
 
             card.setStatus(CardStatus.ACTIVE);
             Card savedCard = cardRepository.save(card);
-            log.info("Card activated successfully");
+            log.info("Карта успешно активирована");
             return convertToDTO(savedCard);
         } catch (Exception e) {
-            log.error("Error activating card: {}", e.getMessage(), e);
+            log.error("Ошибка при активации карты: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -150,13 +190,13 @@ public class CardService {
     public void deleteCard(Long id, UserDetails userDetails) {
         User user = getUserByUsername(userDetails.getUsername());
         Card card = cardRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
         cardRepository.delete(card);
     }
 
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с именем пользователя не найден: " + username));
     }
 
     private CardDTO convertToDTO(Card card) {
@@ -175,7 +215,7 @@ public class CardService {
             // Разделяем строку на месяц и год
             String[] parts = expiryDate.split("/");
             if (parts.length != 2) {
-                throw new CardOperationException("Invalid expiry date format. Expected MM/yy");
+                throw new CardOperationException("Неверный формат даты истечения срока действия. Ожидаемый срок годности, ММ/гг");
             }
 
             int month = Integer.parseInt(parts[0]);
@@ -185,45 +225,127 @@ public class CardService {
             LocalDate expiry = LocalDate.of(year, month, 1).plusMonths(1).minusDays(1);
             return expiry.isBefore(LocalDate.now());
         } catch (NumberFormatException e) {
-            throw new CardOperationException("Invalid expiry date format", e);
+            throw new CardOperationException("Недопустимый формат даты истечения срока действия", e);
         }
     }
 
     @Transactional
     public CardDTO topUpCard(TopUpDTO topUpDTO, UserDetails userDetails) {
-        log.info("Starting top-up for card ID: {}, amount: {}, user: {}",
+        log.info("Начало пополнения счета для идентификатора карты: {}, суммы: {}, пользователя: {}",
                 topUpDTO.getCardId(), topUpDTO.getAmount(), userDetails.getUsername());
 
         try {
             User user = getUserByUsername(userDetails.getUsername());
-            log.info("User found: {}", user.getId());
+            log.info("Пользователь найден: {}", user.getId());
 
             Card card = cardRepository.findByIdAndUser(topUpDTO.getCardId(), user)
                     .orElseThrow(() -> {
-                        log.error("Card not found: {}", topUpDTO.getCardId());
-                        return new ResourceNotFoundException("Card not found with id: " + topUpDTO.getCardId());
+                        log.error("Карта не найдена: {}", topUpDTO.getCardId());
+                        return new ResourceNotFoundException("Карта с id не найдена: " + topUpDTO.getCardId());
                     });
 
-            log.info("Card found: {}, current balance: {}", card.getId(), card.getBalance());
+            log.info("Найдена карта: {}, текущий баланс: {}", card.getId(), card.getBalance());
 
             if (card.getStatus() != CardStatus.ACTIVE) {
-                log.warn("Card is not active: {}", card.getStatus());
-                throw new CardNotActiveException("Cannot top up a non-active card");
+                log.warn("Карта не активна: {}", card.getStatus());
+                throw new CardNotActiveException("Невозможно пополнить счет с неактивной карты");
             }
 
             if (topUpDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                log.warn("Invalid amount: {}", topUpDTO.getAmount());
-                throw new CardOperationException("Amount must be positive");
+                log.warn("Недопустимая сумма: {}", topUpDTO.getAmount());
+                throw new CardOperationException("Сумма должна быть положительной");
             }
 
             card.setBalance(card.getBalance().add(topUpDTO.getAmount()));
             Card savedCard = cardRepository.save(card);
-            log.info("Top-up successful, new balance: {}", savedCard.getBalance());
+            log.info("Успешное пополнение счета, новый баланс: {}", savedCard.getBalance());
 
             return convertToDTO(savedCard);
         } catch (Exception e) {
-            log.error("Error during top-up", e);
+            log.error("Ошибка при пополнении счета", e);
             throw e;
         }
+    }
+
+    public CardDTO adminActivateCard(Long id) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с идентификатором не найдена: " + id));
+
+        if (isCardExpired(card.getExpiryDate())) {
+            throw new CardOperationException("Не удается активировать карту с истекшим сроком действия");
+        }
+
+        card.setStatus(CardStatus.ACTIVE);
+        Card savedCard = cardRepository.save(card);
+        return convertToDTO(savedCard);
+    }
+
+    public void adminDeleteCard(Long id) {
+        if (!cardRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Карта с id не найдена: " + id);
+        }
+        cardRepository.deleteById(id);
+    }
+
+    // Новые методы для пользователя
+    public CardDTO getUserCardById(Long id, UserDetails userDetails) {
+        User user = getUserByUsername(userDetails.getUsername());
+        Card card = cardRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
+        return convertToDTO(card);
+    }
+
+    @Transactional
+    public void transferBetweenUserCards(TransferDTO transferDTO, UserDetails userDetails) {
+        User user = getUserByUsername(userDetails.getUsername());
+
+        Card fromCard = cardRepository.findByIdAndUser(transferDTO.getFromCardId(), user)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + transferDTO.getFromCardId()));
+
+        Card toCard = cardRepository.findByIdAndUser(transferDTO.getToCardId(), user)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + transferDTO.getToCardId()));
+
+        if (fromCard.getStatus() != CardStatus.ACTIVE || toCard.getStatus() != CardStatus.ACTIVE) {
+            throw new CardNotActiveException("Одна или обе карты не активны");
+        }
+
+        if (fromCard.getBalance().compareTo(transferDTO.getAmount()) < 0) {
+            throw new InsufficientFundsException("Недостаточно средств на исходной карте");
+        }
+
+        fromCard.setBalance(fromCard.getBalance().subtract(transferDTO.getAmount()));
+        toCard.setBalance(toCard.getBalance().add(transferDTO.getAmount()));
+
+        cardRepository.save(fromCard);
+        cardRepository.save(toCard);
+    }
+
+    public void requestBlockCard(Long id, UserDetails userDetails) {
+        User user = getUserByUsername(userDetails.getUsername());
+        Card card = cardRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + id));
+
+        // Здесь можно добавить логику отправки запроса на блокировку
+        // Например, отправить уведомление администратору
+        log.info("Пользователь {} запросил заблокировать карту {}", user.getUsername(), id);
+    }
+
+    @Transactional
+    public CardDTO topUpUserCard(TopUpDTO topUpDTO, UserDetails userDetails) {
+        User user = getUserByUsername(userDetails.getUsername());
+        Card card = cardRepository.findByIdAndUser(topUpDTO.getCardId(), user)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта с id не найдена: " + topUpDTO.getCardId()));
+
+        if (card.getStatus() != CardStatus.ACTIVE) {
+            throw new CardNotActiveException("Невозможно пополнить счет с неактивной карты");
+        }
+
+        if (topUpDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new CardOperationException("Сумма должна быть положительной");
+        }
+
+        card.setBalance(card.getBalance().add(topUpDTO.getAmount()));
+        Card savedCard = cardRepository.save(card);
+        return convertToDTO(savedCard);
     }
 }

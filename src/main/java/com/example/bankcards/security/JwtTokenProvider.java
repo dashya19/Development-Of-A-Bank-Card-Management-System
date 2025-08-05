@@ -27,8 +27,8 @@ public class JwtTokenProvider {
     private long jwtExpirationMs;
 
     public String generateToken(UserDetails userDetails) {
-        log.info("Generating token for user: {}", userDetails.getUsername());
-        log.info("User authorities: {}", userDetails.getAuthorities());
+        log.info("Генерация токена для пользователя: {}", userDetails.getUsername());
+        log.info("Полномочия пользователя: {}", userDetails.getAuthorities());
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof org.springframework.security.core.userdetails.User) {
             claims.put("roles", userDetails.getAuthorities().stream()

@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/cards")
 @RequiredArgsConstructor
 public class CardController {
-
     private final CardService cardService;
 
     @GetMapping
@@ -38,50 +37,29 @@ public class CardController {
     public ResponseEntity<CardDTO> getCardById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cardService.getCardById(id, userDetails));
-    }
-
-    @PostMapping
-    public ResponseEntity<CardDTO> createCard(
-            @RequestBody CardDTO cardDTO,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cardService.createCard(cardDTO, userDetails));
+        return ResponseEntity.ok(cardService.getUserCardById(id, userDetails));
     }
 
     @PostMapping("/transfer")
     public ResponseEntity<Void> transferBetweenCards(
             @RequestBody TransferDTO transferDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
-        cardService.transferBetweenCards(transferDTO, userDetails);
+        cardService.transferBetweenUserCards(transferDTO, userDetails);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/block")
-    public ResponseEntity<CardDTO> blockCard(
+    @PostMapping("/request-block/{id}")
+    public ResponseEntity<Void> requestBlockCard(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cardService.blockCard(id, userDetails));
-    }
-
-    @PutMapping("/{id}/activate")
-    public ResponseEntity<CardDTO> activateCard(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cardService.activateCard(id, userDetails));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCard(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        cardService.deleteCard(id, userDetails);
-        return ResponseEntity.noContent().build();
+        cardService.requestBlockCard(id, userDetails);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/top-up")
     public ResponseEntity<CardDTO> topUpCard(
             @RequestBody TopUpDTO topUpDTO,
             @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cardService.topUpCard(topUpDTO, userDetails));
+        return ResponseEntity.ok(cardService.topUpUserCard(topUpDTO, userDetails));
     }
 }
