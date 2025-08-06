@@ -61,13 +61,13 @@ JWT_EXPIRATION_MS=86400000  # 24 часа
 - JWT_SECRET - секретный ключ (можно сгенерировать например командой: openssl rand -base64 32)
 - JWT_EXPIRATION_MS - время жизни JWT-токена (можно изменить на другое)
    
-4. Команды для запуска:
+2. Команды для запуска:
    ```bash
    mvn clean package             # Сборка проекта
    docker-compose up -d          # Запуск в фоновом режиме
    docker-compose up --build     # Пересборка и запуск
 
-5. Доступ к БД:
+3. Доступ к БД:
    ```bash
    docker exec -it bank_cards_postgres psql -U postgres -d bank_cards_db
    
