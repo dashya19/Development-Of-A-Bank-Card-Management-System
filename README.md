@@ -35,30 +35,30 @@ Backend-приложение для безопасного управления 
 
 *Перед запуском создайте файл `.env` в корне проекта со следующим содержимым:*
 
-   ```ini
-   DB_NAME=bank_cards_db
-   DB_USERNAME=postgres
-   DB_PASSWORD=your_strong_password_here  # Замените на свой пароль
-   DB_PORT=5432
+```ini
+DB_NAME=bank_cards_db
+DB_USERNAME=postgres
+DB_PASSWORD=your_strong_password_here  # Замените на свой пароль
+DB_PORT=5432
 
-   # Application
-   APP_PORT=8080
+# Application
+APP_PORT=8080
 
-   # Admin credentials
-   ADMIN_USERNAME=admin
-   ADMIN_PASSWORD=strong_admin_password    # Обязательно измените!
-   ADMIN_EMAIL=admin@example.com
+# Admin credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=strong_admin_password    # Обязательно измените!
+ADMIN_EMAIL=admin@example.com
 
-   # JWT Settings
-   JWT_SECRET=your_very_long_random_secret_here  # Сгенерируйте новый
-   JWT_EXPIRATION_MS=86400000  # 24 часа
-   ```
-   
+# JWT Settings
+JWT_SECRET=your_very_long_random_secret_here  # Сгенерируйте новый
+JWT_EXPIRATION_MS=86400000  # 24 часа
+```
+
 *Обязательно изменить:*
 
-   -DB_PASSWORD - пароль для PostgreSQL
-   -ADMIN_PASSWORD - пароль администратора
-   -JWT_SECRET (можно сгенерировать например командой: openssl rand -base64 32)
+- DB_PASSWORD - пароль для PostgreSQL
+- ADMIN_PASSWORD - пароль администратора
+- JWT_SECRET (можно сгенерировать например командой: openssl rand -base64 32)
    
 4. Команды для запуска:
    ```bash
