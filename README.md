@@ -1,6 +1,6 @@
 # 🏦 Система управления банковскими картами
 
-![Java](https://img.shields.io/badge/Java-17-red.svg)
+![Java](https://img.shields.io/badge/Java-21-red.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.0-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)
 ![Liquibase](https://img.shields.io/badge/Liquibase-4.25.0-yellow.svg)
@@ -16,7 +16,7 @@ Backend-приложение для безопасного управления 
 
 ## 🛠 Технологии
 
-- **Backend**: Java 17, Spring Boot 3.1
+- **Backend**: Java 21, Spring Boot 3.1
 - **Безопасность**: Spring Security, JWT
 - **База данных**: PostgreSQL 15
 - **Миграции**: Liquibase
