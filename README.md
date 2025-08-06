@@ -74,12 +74,12 @@ JWT_EXPIRATION_MS=86400000  # 24 часа
 ## 📌 Документация API (Postman)
 
 ### Регистрация пользователя:
-
+***HTTP Request***
 ```http
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 ```
-
+***Request Body***
 ```json
 {
     "username": "user1",
@@ -87,7 +87,6 @@ Content-Type: application/json
     "email": "user1@example.com"
 }
 ```
-
 **Ответ: 200 OK**
 
 ### Авторизация пользователя:
