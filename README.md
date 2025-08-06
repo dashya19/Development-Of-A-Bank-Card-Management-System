@@ -31,13 +31,38 @@ Backend-приложение для безопасного управления 
 - Docker Compose 2.0+
 
 ### Инструкция по запуску
-1. Команды для запуска:
+1. Настройка окружения:
+   1. Перед запуском создайте файл `.env` в корне проекта со следующим содержимым:
+   ```ini
+   DB_NAME=bank_cards_db
+   DB_USERNAME=postgres
+   DB_PASSWORD=your_strong_password_here  # Замените на свой пароль
+   DB_PORT=5432
+
+   # Application
+   APP_PORT=8080
+
+   # Admin credentials
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=strong_admin_password    # Обязательно измените!
+   ADMIN_EMAIL=admin@example.com
+
+   # JWT Settings
+   JWT_SECRET=your_very_long_random_secret_here  # Сгенерируйте новый
+   JWT_EXPIRATION_MS=86400000  # 24 часа
+   
+   2. Обязательно изменить:
+   DB_PASSWORD - пароль для PostgreSQL
+   ADMIN_PASSWORD - пароль администратора
+   JWT_SECRET (можно сгенерировать например командой: openssl rand -base64 32)
+   
+2. Команды для запуска:
    ```bash
    mvn clean package             # Сборка проекта
    docker-compose up -d          # Запуск в фоновом режиме
    docker-compose up --build     # Пересборка и запуск
 
-2. Доступ к БД:
+3. Доступ к БД:
    ```bash
    docker exec -it bank_cards_postgres psql -U postgres -d bank_cards_db
    
