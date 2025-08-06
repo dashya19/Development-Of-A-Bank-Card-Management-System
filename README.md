@@ -46,11 +46,11 @@ APP_PORT=8080
 
 # Admin credentials
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=strong_admin_password    # Обязательно измените!
+ADMIN_PASSWORD=strong_admin_password    # Замените пароль администратора
 ADMIN_EMAIL=admin@example.com
 
 # JWT Settings
-JWT_SECRET=your_very_long_random_secret_here  # Сгенерируйте новый
+JWT_SECRET=your_very_long_random_secret_here  # Сгенерируйте новый токен
 JWT_EXPIRATION_MS=86400000  # 24 часа
 ```
 
@@ -58,7 +58,8 @@ JWT_EXPIRATION_MS=86400000  # 24 часа
 
 - DB_PASSWORD - пароль для PostgreSQL
 - ADMIN_PASSWORD - пароль администратора
-- JWT_SECRET (можно сгенерировать например командой: openssl rand -base64 32)
+- JWT_SECRET - секретный ключ (можно сгенерировать например командой: openssl rand -base64 32)
+- JWT_EXPIRATION_MS - время жизни JWT-токена (можно изменить на другое)
    
 4. Команды для запуска:
    ```bash
