@@ -74,12 +74,12 @@ JWT_EXPIRATION_MS=86400000  # 24 часа
 ## 📌 Документация API (Postman)
 
 ### Регистрация пользователя:
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/auth/register
 Content-Type: application/json
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "username": "user1",
@@ -87,24 +87,24 @@ Content-Type: application/json
     "email": "user1@example.com"
 }
 ```
-***Status Code: 200 OK***
+*Status Code: 200 OK*
 
 ### Авторизация пользователя:
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "username": "user1",
     "password": "password1"
 }
 ```
-***Status Code: 200 OK***
+*Status Code: 200 OK*
 
-***Response Body***
+**Response Body**
 ```json
 {
     "token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoidXNlcjEiLCJpYXQiOjE3NTQzOTk4NDgsImV4cCI6MTc1NDQ4NjI0OH0.GxEslS-6CKT31uHe15DHo8US2ylix3cD7oU6XSdm5Is"
@@ -112,20 +112,21 @@ Content-Type: application/json
 ```
 
 ### Авторизация администратора:
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "username": "admin",
     "password": "password"
 }
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluIiwiaWF0IjoxNzU0Mzk5ODg5LCJleHAiOjE3NTQ0ODYyODl9.Nuy34K-LNrxURj8WPbFJ9z7CsiPyklLnFqUfVoK7BAM"
@@ -133,13 +134,13 @@ Content-Type: application/json
 ```
 
 ### Создание новой карты (администратор создает карту для пользователя):
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/admin/cards?userId=2
 Content-Type: application/json
 Authorization: Bearer <токен администратора>
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "cardNumber": "1234567812345678",
@@ -147,8 +148,9 @@ Authorization: Bearer <токен администратора>
     "expiryDate": "08/26"
 }
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
@@ -161,13 +163,13 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Создание новой карты (администратор создает вторую карту для пользователя):
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/admin/cards?userId=2
 Content-Type: application/json
 Authorization: Bearer <токен администратора>
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "cardNumber": "2234567812345678",
@@ -175,8 +177,9 @@ Authorization: Bearer <токен администратора>
     "expiryDate": "08/26"
 }
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 2,
@@ -189,13 +192,14 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Получение всех карт пользователей (с пагинацией, администратор получает информацию о всех картах):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/admin/cards?page=0&size=3
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "content": [
@@ -253,13 +257,14 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Получение всех карт пользователей (без пагинации, администратор получает информацию о всех картах):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/admin/cards
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "content": [
@@ -325,13 +330,14 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Получение всех карт пользователя (без пагинации, администратор получает информацию о всех картах пользователя):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/cards/all
 Authorization: Bearer <токен пользователя>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 [
     {
@@ -354,13 +360,14 @@ Authorization: Bearer <токен пользователя>
 ```
 
 ### Получение конкретной карты (без пагинации, администратор получает информацию об одной карте):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/cards/1
 Authorization: Bearer <токен пользователя>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
@@ -373,21 +380,22 @@ Authorization: Bearer <токен пользователя>
 ```
 
 ### Пополнение первой карты (пользователь пополняет баланс карты):
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/cards/top-up
 Content-Type: application/json
 Authorization: Bearer <токен пользователя>
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "cardId": 1,
     "amount": 2000.00
 }
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
@@ -400,13 +408,13 @@ Authorization: Bearer <токен пользователя>
 ```
 
 ### Перевод средств между картами (пользователь переводит денежные средства на другой счет):
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/cards/transfer
 Content-Type: application/json
 Authorization: Bearer <токен пользователя>
 ```
-***Request Body***
+**Request Body**
 ```json
 {
     "fromCardId": 1,
@@ -414,16 +422,17 @@ Authorization: Bearer <токен пользователя>
     "amount": 500.00
 }
 ```
-***Status Code: 200 OK***
+*Status Code: 200 OK*
 
 ### Получение всех карт пользователя (без пагинации, пользователь получает информацию о балансе на картах для проверки перевода денежных средств между картами):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/cards/all
 Authorization: Bearer <токен пользователя>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 [
     {
@@ -446,21 +455,22 @@ Authorization: Bearer <токен пользователя>
 ```
 
 ### Блокировка карты (пользователь отправляет запрос на блокировку карты):
-***HTTP Request***
+**HTTP Request**
 ```http
 POST http://localhost:8080/api/cards/request-block/1
 Authorization: Bearer <токен пользователя>
 ```
-***Status Code: 200 OK***
+*Status Code: 200 OK*
 
 ### Блокировка карты (администратор блокирует карту пользователя):
-***HTTP Request***
+**HTTP Request**
 ```http
 PUT http://localhost:8080/api/admin/cards/1/block
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
@@ -473,13 +483,14 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Активирование карты (администратор активирует карту пользователя):
-***HTTP Request***
+**HTTP Request**
 ```http
 PUT http://localhost:8080/api/admin/cards/1/activate
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
@@ -492,21 +503,22 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Удаление карты (администратор удаляет карту):
-***HTTP Request***
+**HTTP Request**
 ```http
 DELETE http://localhost:8080/api/admin/cards/1
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 204 No Content***
+*Status Code: 204 No Content*
 
 ### Получение информации о всех пользователей (администратор получает информацию о всех пользователей):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/admin/users
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 [
     {
@@ -669,13 +681,14 @@ Authorization: Bearer <токен администратора>
 ```
 
 ### Получение информации о конкретном пользователе (администратор получает информацию о конкретном пользователе):
-***HTTP Request***
+**HTTP Request**
 ```http
 GET http://localhost:8080/api/admin/users/1
 Authorization: Bearer <токен администратора>
 ```
-***Status Code: 200 OK***
-***Response Body***
+*Status Code: 200 OK*
+
+**Response Body**
 ```json
 {
     "id": 1,
