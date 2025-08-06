@@ -103,6 +103,7 @@ Content-Type: application/json
 }
 ```
 ***Status Code: 200 OK***
+
 ***Response Body***
 ```json
 {
